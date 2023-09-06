@@ -6,6 +6,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack"
 
 import HomeScreen from "./Screens/HomeScreen"
 import FilmScreen from "./Screens/FilmScreen"
+import ResultsScreen from "./Screens/ResultsScreen"
 
 const Stack = createNativeStackNavigator()
 
@@ -14,6 +15,7 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="Results" component={ResultsScreen} />
         <Stack.Screen name="SingleFilm" component={FilmScreen} />
       </Stack.Navigator>
     </NavigationContainer>
