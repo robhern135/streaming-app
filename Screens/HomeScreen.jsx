@@ -12,7 +12,9 @@ import { useEffect, useState } from "react"
 import axios from "axios"
 import ResultRow from "../Components/ResultRow"
 
-const HomeScreen = () => {
+import { API_KEY } from "@env"
+
+const HomeScreen = ({ navigation }) => {
   const [films, setFilms] = useState()
   const [text, setText] = useState()
 
@@ -26,7 +28,7 @@ const HomeScreen = () => {
       output_language: "en",
     },
     headers: {
-      "X-RapidAPI-Key": "09e98ec5demsh1f37c6d5d68f08ap1dd33fjsn95b58d6fd013",
+      "X-RapidAPI-Key": API_KEY,
       "X-RapidAPI-Host": "streaming-availability.p.rapidapi.com",
     },
   }
@@ -54,7 +56,10 @@ const HomeScreen = () => {
         />
         <Button title="search" onPress={searchByTitle} />
         <ScrollView style={styles.resultsList}>
-          {films && films?.map((f) => <ResultRow data={f} />)}
+          {films &&
+            films?.map((f) => (
+              <ResultRow navigation={navigation} key={f.tmdbId} data={f} />
+            ))}
           <View style={{ height: 100 }}></View>
         </ScrollView>
       </View>
