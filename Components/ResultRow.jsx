@@ -2,6 +2,8 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import React, { useEffect, useState } from "react"
 import axios from "axios"
 
+import { AUTHORIZATION } from "@env"
+
 const ResultRow = ({ data, navigation }) => {
   const { title, year, type, tmdbId } = data
   const [images, setImages] = useState()
@@ -24,8 +26,7 @@ const ResultRow = ({ data, navigation }) => {
     url: `https://api.themoviedb.org/3/movie/${tmdbId}/images`,
     headers: {
       accept: "application/json",
-      Authorization:
-        "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkMjNiM2U3YzMyOGQ3YTJjMzRkOGM2OGY3ZjlhNDBmOCIsInN1YiI6IjVjNWM0ZjMzYzNhMzY4M2NjZjg5YzU4ZSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.3XVraLCrsIywNrqtPHvNqcTqIaBRMgFKtq_aXdRJ8lI",
+      Authorization: AUTHORIZATION,
     },
   }
 
