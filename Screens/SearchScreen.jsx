@@ -21,7 +21,7 @@ const windowHeight = Dimensions.get("window").height
 const SearchScreen = () => {
   let navigation = useNavigation()
 
-  const [results, setResults] = useState([1, 2, 3, 4, 5, 6, 7, 8, 9])
+  const [results, setResults] = useState([])
 
   useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false })
@@ -44,27 +44,48 @@ const SearchScreen = () => {
             </Text>
           </TouchableOpacity>
         </View>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingHorizontal: 20 }}
-        >
-          <Text style={styles.searchText}>Results ({results.length})</Text>
-          <View style={styles.resultsContainer}>
-            {results?.map((item, idx) => {
-              return (
-                <TouchableWithoutFeedback
-                  key={idx}
-                  onPress={() => navigation.push("MovieScreen", item)}
-                >
-                  <Image
-                    source={{ uri: "https://via.placeholder.com/300x400" }}
-                    style={styles.poster}
-                  />
-                </TouchableWithoutFeedback>
-              )
-            })}
+        {results && results.length > 0 ? (
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingHorizontal: 20 }}
+          >
+            {results && (
+              <Text style={styles.searchText}>Results ({results.length})</Text>
+            )}
+            <View style={styles.resultsContainer}>
+              {results?.map((item, idx) => {
+                let movieName = "Ant Man and the Wasp: Quantum"
+                return (
+                  <TouchableWithoutFeedback
+                    key={idx}
+                    onPress={() => navigation.push("MovieScreen", item)}
+                  >
+                    <View style={styles.button}>
+                      <Image
+                        source={{ uri: "https://via.placeholder.com/300x400" }}
+                        style={styles.poster}
+                      />
+                      <Text style={styles.title}>
+                        {movieName.length > 17
+                          ? `${movieName.slice(0, 17)}...`
+                          : movieName}
+                      </Text>
+                    </View>
+                  </TouchableWithoutFeedback>
+                )
+              })}
+            </View>
+          </ScrollView>
+        ) : (
+          <View
+            style={{ alignItems: "center", flex: 1, justifyContent: "center" }}
+          >
+            <Image
+              source={require("../assets/movieTime.png")}
+              style={{ width: windowWidth * 0.9, height: windowWidth * 0.6 }}
+            />
           </View>
-        </ScrollView>
+        )}
       </SafeAreaView>
     </>
   )
@@ -100,9 +121,19 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     gap: 20,
   },
+  button: {
+    alignItems: "center",
+    justifyContent: "flex-start",
+    gap: 10,
+  },
   poster: {
     borderRadius: 10,
     width: windowWidth * 0.43,
     height: windowHeight * 0.3,
+  },
+  title: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: themeStyles.grey,
   },
 })
