@@ -1,19 +1,27 @@
 import {
+  Image,
   SafeAreaView,
+  ScrollView,
+  Dimensions,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from "react-native"
-import React, { useLayoutEffect } from "react"
+import React, { useLayoutEffect, useState } from "react"
 import { themeStyles } from "../themeStyles"
 import TopBar from "../Components/TopBar"
 import { useNavigation } from "@react-navigation/native"
 import { XMarkIcon } from "react-native-heroicons/outline"
 
+const windowWidth = Dimensions.get("window").width
+const windowHeight = Dimensions.get("window").height
 const SearchScreen = () => {
   let navigation = useNavigation()
+
+  const [results, setResults] = useState([1, 2, 3, 4, 5, 6, 7, 8, 9])
 
   useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false })
@@ -36,6 +44,27 @@ const SearchScreen = () => {
             </Text>
           </TouchableOpacity>
         </View>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingHorizontal: 20 }}
+        >
+          <Text style={styles.searchText}>Results ({results.length})</Text>
+          <View style={styles.resultsContainer}>
+            {results?.map((item, idx) => {
+              return (
+                <TouchableWithoutFeedback
+                  key={idx}
+                  onPress={() => navigation.push("MovieScreen", item)}
+                >
+                  <Image
+                    source={{ uri: "https://via.placeholder.com/300x400" }}
+                    style={styles.poster}
+                  />
+                </TouchableWithoutFeedback>
+              )
+            })}
+          </View>
+        </ScrollView>
       </SafeAreaView>
     </>
   )
@@ -63,5 +92,17 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "white",
     fontSize: 25,
+  },
+  searchText: { marginVertical: 10, color: "white", fontWeight: "bold" },
+  resultsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-betwwen",
+    flexWrap: "wrap",
+    gap: 20,
+  },
+  poster: {
+    borderRadius: 10,
+    width: windowWidth * 0.43,
+    height: windowHeight * 0.3,
   },
 })

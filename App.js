@@ -10,7 +10,7 @@ import PersonScreen from "./Screens/PersonScreen"
 import SearchScreen from "./Screens/SearchScreen"
 
 const Stack = createNativeStackNavigator()
-
+//https://youtu.be/Q1xQuCpYIFE?t=3059
 export default function App() {
   return (
     <NavigationContainer>
