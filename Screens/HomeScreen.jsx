@@ -76,6 +76,10 @@ const HomeScreen = ({ navigation }) => {
       setLoading(false)
     }
   }
+
+  const openMenu = () => {
+    navigation.navigate("InfoScreen")
+  }
   if (loading) {
     return <LoadingIndicator />
   } else {
@@ -84,7 +88,9 @@ const HomeScreen = ({ navigation }) => {
         <SafeAreaView>
           <StatusBar style="light" />
           <View style={styles.header}>
-            <Bars3CenterLeftIcon size="30" strokeWidth={2} color="white" />
+            <TouchableOpacity onPress={openMenu}>
+              <Bars3CenterLeftIcon size="30" strokeWidth={2} color="white" />
+            </TouchableOpacity>
             <Text style={styles.title}>
               <Text style={{ color: themeStyles.yellow }}>M</Text>ovies
             </Text>

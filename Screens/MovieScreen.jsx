@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native"
+
 import React, { useEffect, useLayoutEffect, useState } from "react"
 import { useNavigation } from "@react-navigation/native"
 import { themeStyles } from "../themeStyles"
@@ -17,6 +18,9 @@ import Cast from "../Components/Cast"
 import TopBar from "../Components/TopBar"
 import MovieList from "../Components/MovieList"
 import LoadingIndicator from "../Components/LoadingIndicator"
+
+import axios from "axios"
+
 import {
   fetchMovieCredits,
   fetchMovieDetails,
@@ -24,6 +28,9 @@ import {
 } from "../api/moviedb"
 import MovieStats from "../Components/MovieStats"
 import Genres from "../Components/Genres"
+
+import { API_KEY } from "@env"
+import Streaming from "../Components/Streaming"
 
 const windowWidth = Dimensions.get("window").width
 const windowHeight = Dimensions.get("window").height
@@ -38,20 +45,23 @@ const MovieScreen = ({ route }) => {
   const [similar, setSimilar] = useState()
   const [loading, setLoading] = useState(true)
   const [movie, setMovie] = useState()
+  const [streaming, setStreaming] = useState()
 
   useEffect(() => {
     console.log(`itemid: ${id}`)
     setLoading(true)
-    getMovieDetails(id)
-    getMovieCredits(id)
-    getSimilarMovies(id)
+    if (id) {
+      getMovieDetails(id)
+      getMovieCredits(id)
+      getSimilarMovies(id)
+      fetchStreaming(id)
+    }
   }, [item])
 
   const getMovieDetails = async (id) => {
     const data = await fetchMovieDetails(id)
     setMovie(data)
     setLoading(false)
-    // console.log(data)
   }
   const getMovieCredits = async (id) => {
     const data = await fetchMovieCredits(id)
@@ -61,6 +71,29 @@ const MovieScreen = ({ route }) => {
     const data = await fetchSimilarMovies(id)
     setSimilar(data.results)
     // console.log(data)
+  }
+
+  const fetchStreaming = (id) => {
+    const options = {
+      method: "GET",
+      url: "https://streaming-availability.p.rapidapi.com/get",
+      params: {
+        output_language: "en",
+        tmdb_id: `movie/${id}`,
+      },
+      headers: {
+        "X-RapidAPI-Key": API_KEY,
+        "X-RapidAPI-Host": "streaming-availability.p.rapidapi.com",
+      },
+    }
+    try {
+      axios(options).then((res) => {
+        // console.log(res.data.result.streamingInfo)
+        setStreaming(res.data.result.streamingInfo)
+      })
+    } catch (err) {
+      console.log(`error getting streaing: ${err}`)
+    }
   }
 
   useEffect(() => {
@@ -89,15 +122,16 @@ const MovieScreen = ({ route }) => {
                 source={{
                   uri: backdrop_path
                     ? `${imagePath}${backdrop_path}`
-                    : require("../assets/poster.png"),
+                    : Image.resolveAssetSource(require("../assets/poster.png"))
+                        .uri,
                 }}
                 style={styles.image}
               />
               <LinearGradient
                 colors={[
                   "transparent",
-                  "rgba(23,23,23,0.8)",
-                  "rgba(23,23,23,1)",
+                  "rgba(29,29,29,0.8)",
+                  "rgba(29,29,29,1)",
                 ]}
                 style={styles.linearGradient}
                 start={{ x: 0.5, y: 0 }}
@@ -119,11 +153,12 @@ const MovieScreen = ({ route }) => {
                 <Text style={styles.descText}>{overview}</Text>
               </View>
             )}
+            <Streaming data={streaming} />
             <Cast cast={cast} />
 
-            {similar && (
+            {similar && similar.length > 0 ? (
               <MovieList title="Similar Movies" data={similar} hideSeeAll />
-            )}
+            ) : null}
           </ScrollView>
         </>
       )

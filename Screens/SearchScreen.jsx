@@ -61,11 +61,6 @@ const SearchScreen = () => {
             placeholderTextColor={themeStyles.grey}
             style={styles.input}
           />
-          <TouchableOpacity onPress={() => {}}>
-            <Text style={styles.buttonText}>
-              <XMarkIcon size="25" color="white" style={{ marginLeft: 20 }} />
-            </Text>
-          </TouchableOpacity>
         </View>
         {results && results.length > 0 ? (
           <ScrollView

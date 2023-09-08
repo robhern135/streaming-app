@@ -8,6 +8,8 @@ import {
 } from "react-native"
 import React, { useEffect } from "react"
 
+import { ParallaxImage } from "react-native-snap-carousel"
+
 const windowWidth = Dimensions.get("window").width
 const windowHeight = Dimensions.get("window").height
 const imagePath = "https://image.tmdb.org/t/p/w500"

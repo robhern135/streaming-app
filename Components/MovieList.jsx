@@ -16,8 +16,12 @@ import MovieListItem from "./MovieListItem"
 const MovieList = ({ title, data, hideSeeAll }) => {
   let navigation = useNavigation()
 
-  const onPress = (item) => {
-    navigation.push("MovieScreen", { item })
+  // const onPress = (item) => {
+  //   navigation.push("MovieScreen", { item })
+  // }
+
+  const onSeeAll = () => {
+    navigation.push("MovieListScreen", { data, title })
   }
 
   if (data) {
@@ -26,7 +30,7 @@ const MovieList = ({ title, data, hideSeeAll }) => {
         <View style={styles.titleContainer}>
           {title && <Text style={styles.title}>{title}</Text>}
           {!hideSeeAll && (
-            <TouchableOpacity>
+            <TouchableOpacity onPress={onSeeAll}>
               <Text style={styles.buttonText}>See all</Text>
             </TouchableOpacity>
           )}

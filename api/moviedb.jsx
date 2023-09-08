@@ -1,4 +1,4 @@
-import { API_KEY, AUTHORIZATION } from "@env"
+import { AUTHORIZATION } from "@env"
 
 import axios from "axios"
 
@@ -24,8 +24,7 @@ const apiCall = async (endpoint, params) => {
     params: params ? params : {},
     headers: {
       accept: "application/json",
-      Authorization:
-        "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkMjNiM2U3YzMyOGQ3YTJjMzRkOGM2OGY3ZjlhNDBmOCIsInN1YiI6IjVjNWM0ZjMzYzNhMzY4M2NjZjg5YzU4ZSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.3XVraLCrsIywNrqtPHvNqcTqIaBRMgFKtq_aXdRJ8lI",
+      Authorization: AUTHORIZATION,
     },
   }
   try {
