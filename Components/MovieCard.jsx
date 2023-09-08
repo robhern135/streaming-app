@@ -6,20 +6,27 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native"
-import React from "react"
+import React, { useEffect } from "react"
 
 const windowWidth = Dimensions.get("window").width
 const windowHeight = Dimensions.get("window").height
+const imagePath = "https://image.tmdb.org/t/p/w500"
 
 const MovieCard = ({ item, navigation }) => {
+  const { poster_path } = item
+
   const onPress = () => {
-    navigation.navigate("MovieScreen", { item: item })
+    navigation.navigate("MovieScreen", { item })
   }
 
   return (
     <TouchableWithoutFeedback onPress={onPress}>
       <Image
-        source={{ uri: "https://via.placeholder.com/500/800" }}
+        source={{
+          uri: poster_path
+            ? `${imagePath}${poster_path}`
+            : Image.resolveAssetSource(require("../assets/poster.png")).uri,
+        }}
         style={styles.poster}
       />
     </TouchableWithoutFeedback>

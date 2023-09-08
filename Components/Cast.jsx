@@ -4,9 +4,11 @@ import { TouchableOpacity } from "react-native"
 
 import { themeStyles } from "../themeStyles"
 import { useNavigation } from "@react-navigation/native"
+import CastItem from "./CastItem"
 
 const Cast = ({ cast }) => {
   let characterName = "Character Name here"
+
   const onPress = (person) => {
     navigation.navigate("PersonScreen", { person })
   }
@@ -23,26 +25,7 @@ const Cast = ({ cast }) => {
           contentContainerStyle={{ paddingHorizontal: 20, gap: 10 }}
         >
           {cast?.map((person, idx) => {
-            return (
-              <TouchableOpacity
-                onPress={() => onPress(person)}
-                key={idx}
-                style={styles.castButton}
-              >
-                <Image
-                  source={{ uri: "https://via.placeholder.com/150x150" }}
-                  style={styles.headshot}
-                />
-                <Text style={[styles.name, { fontWeight: "bold" }]}>
-                  Cast name
-                </Text>
-                <Text style={styles.name}>
-                  {characterName.length > 10
-                    ? `${characterName.slice(0, 10)}...`
-                    : characterName}
-                </Text>
-              </TouchableOpacity>
-            )
+            return <CastItem person={person} key={idx} index={idx} />
           })}
         </ScrollView>
       </View>
@@ -64,21 +47,5 @@ const styles = StyleSheet.create({
     fontSize: 25,
     color: "white",
     marginBottom: 20,
-  },
-  castButton: {
-    alignItems: "center",
-  },
-  name: {
-    color: themeStyles.grey,
-    fontSize: 16,
-    marginBottom: 5,
-  },
-  headshot: {
-    height: 100,
-    width: 100,
-    borderRadius: "50",
-    aspectRatio: 1 / 1,
-    objectFit: "cover",
-    marginBottom: 10,
   },
 })

@@ -5,7 +5,6 @@ import {
   StyleSheet,
   Dimensions,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
   SafeAreaView,
@@ -25,50 +24,91 @@ import { API_KEY, AUTHORIZATION } from "@env"
 import TrendingMovies from "../Components/TrendingMovies"
 import MovieList from "../Components/MovieList"
 
+import LoadingIndicator from "../Components/LoadingIndicator"
+import {
+  fetchTopRatedMovies,
+  fetchTrendingMovies,
+  fetchUpcomingMovies,
+} from "../api/moviedb"
+
 const windowWidth = Dimensions.get("window").width
 const windowHeight = Dimensions.get("window").height
-
 const ios = Platform.OS == "ios"
 
 const HomeScreen = ({ navigation }) => {
-  // const [text, setText] = useState()
-  // const [popular, setPopular] = useState()
+  const [trending, setTrending] = useState()
+  const [upcoming, setUpcoming] = useState()
+  const [topRated, setTopRated] = useState()
 
-  const [trending, setTrending] = useState([1, 2, 3])
-  const [upcoming, setUpcoming] = useState([1, 2, 3])
-  const [topRated, setTopRated] = useState([1, 2, 3])
+  const [loading, setLoading] = useState(true)
 
   useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false })
   }, [navigation])
 
-  return (
-    <View style={styles.container}>
-      <SafeAreaView>
-        <StatusBar style="light" />
-        <View style={styles.header}>
-          <Bars3CenterLeftIcon size="30" strokeWidth={2} color="white" />
-          <Text style={styles.title}>
-            <Text style={{ color: themeStyles.yellow }}>M</Text>ovies
-          </Text>
-          <TouchableOpacity onPress={() => navigation.push("SearchScreen")}>
-            <MagnifyingGlassIcon size={30} color="white" strokeWidth={2} />
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
-      <ScrollView
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 10 }}
-      >
-        {/* Trending Movies in carousel */}
-        <TrendingMovies data={trending} navigation={navigation} />
-        {/* Upcoming movies in list */}
-        <MovieList title="Upcoming" data={upcoming} />
-        {/* Top Rated movies in list */}
-        <MovieList title="Top Rated" data={topRated} />
-      </ScrollView>
-    </View>
-  )
+  useEffect(() => {
+    getTrendingMovies()
+    getUpcomingMovies()
+    getTopRatedMovies()
+  }, [])
+
+  const getTrendingMovies = async () => {
+    const data = await fetchTrendingMovies()
+    console.log("got trending movies")
+    if (data && data.results) {
+      setTrending(data.results)
+      setLoading(false)
+    }
+  }
+  const getUpcomingMovies = async () => {
+    const data = await fetchUpcomingMovies()
+    console.log("got upcoming movies")
+    if (data && data.results) {
+      setUpcoming(data.results)
+      setLoading(false)
+    }
+  }
+  const getTopRatedMovies = async () => {
+    const data = await fetchTopRatedMovies()
+    console.log("got top rated movies")
+    if (data && data.results) {
+      setTopRated(data.results)
+      setLoading(false)
+    }
+  }
+  if (loading) {
+    return <LoadingIndicator />
+  } else {
+    return (
+      <View style={styles.container}>
+        <SafeAreaView>
+          <StatusBar style="light" />
+          <View style={styles.header}>
+            <Bars3CenterLeftIcon size="30" strokeWidth={2} color="white" />
+            <Text style={styles.title}>
+              <Text style={{ color: themeStyles.yellow }}>M</Text>ovies
+            </Text>
+            <TouchableOpacity onPress={() => navigation.push("SearchScreen")}>
+              <MagnifyingGlassIcon size={30} color="white" strokeWidth={2} />
+            </TouchableOpacity>
+          </View>
+        </SafeAreaView>
+        <ScrollView
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 10 }}
+        >
+          {/* Trending Movies in carousel */}
+          {trending && (
+            <TrendingMovies data={trending} navigation={navigation} />
+          )}
+          {/* Upcoming movies in list */}
+          <MovieList title="Upcoming" data={upcoming} />
+          {/* Top Rated movies in list */}
+          <MovieList title="Top Rated" data={topRated} />
+        </ScrollView>
+      </View>
+    )
+  }
 }
 
 export default HomeScreen

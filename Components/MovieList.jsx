@@ -7,13 +7,11 @@ import {
   ScrollView,
   View,
 } from "react-native"
-import React from "react"
+import React, { useEffect } from "react"
 
 import { useNavigation } from "@react-navigation/native"
 import { themeStyles } from "../themeStyles"
-
-const windowWidth = Dimensions.get("window").width
-const windowHeight = Dimensions.get("window").height
+import MovieListItem from "./MovieListItem"
 
 const MovieList = ({ title, data, hideSeeAll }) => {
   let navigation = useNavigation()
@@ -40,21 +38,7 @@ const MovieList = ({ title, data, hideSeeAll }) => {
           contentContainerStyle={{ paddingHorizontal: 15, gap: 10 }}
         >
           {data?.map((item, idx) => {
-            let movieName = "Antman and the Wasp: Quantum"
-
-            return (
-              <TouchableOpacity onPress={() => onPress(item)} key={idx}>
-                <Image
-                  source={{ uri: "https://via.placeholder.com/500/800" }}
-                  style={styles.poster}
-                />
-                <Text style={styles.movieName}>
-                  {movieName.length > 14
-                    ? `${movieName.slice(0, 14)}...`
-                    : movieName}
-                </Text>
-              </TouchableOpacity>
-            )
+            return <MovieListItem item={item} key={idx} />
           })}
         </ScrollView>
       </View>
@@ -84,11 +68,5 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 18,
     color: themeStyles.yellow,
-  },
-  movieName: { color: "white", marginTop: 10 },
-  poster: {
-    width: windowWidth * 0.33,
-    height: windowHeight * 0.22,
-    borderRadius: 15,
   },
 })

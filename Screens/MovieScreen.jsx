@@ -16,64 +16,121 @@ import { LinearGradient } from "expo-linear-gradient"
 import Cast from "../Components/Cast"
 import TopBar from "../Components/TopBar"
 import MovieList from "../Components/MovieList"
+import LoadingIndicator from "../Components/LoadingIndicator"
+import {
+  fetchMovieCredits,
+  fetchMovieDetails,
+  fetchSimilarMovies,
+} from "../api/moviedb"
+import MovieStats from "../Components/MovieStats"
+import Genres from "../Components/Genres"
 
 const windowWidth = Dimensions.get("window").width
 const windowHeight = Dimensions.get("window").height
+const imagePath = "https://image.tmdb.org/t/p/original"
 
 const MovieScreen = ({ route }) => {
   let navigation = useNavigation()
   const { item } = route.params
+  const { id, backdrop_path, title } = item
 
-  const [cast, setCast] = useState([1, 2, 3, 4, 5, 6])
-  const [similar, setSimilar] = useState([1, 2, 3, 4, 5, 6])
+  const [cast, setCast] = useState()
+  const [similar, setSimilar] = useState()
+  const [loading, setLoading] = useState(true)
+  const [movie, setMovie] = useState()
 
-  useEffect(() => {}, [item])
+  useEffect(() => {
+    console.log(`itemid: ${id}`)
+    setLoading(true)
+    getMovieDetails(id)
+    getMovieCredits(id)
+    getSimilarMovies(id)
+  }, [item])
+
+  const getMovieDetails = async (id) => {
+    const data = await fetchMovieDetails(id)
+    setMovie(data)
+    setLoading(false)
+    // console.log(data)
+  }
+  const getMovieCredits = async (id) => {
+    const data = await fetchMovieCredits(id)
+    setCast(data.cast)
+  }
+  const getSimilarMovies = async (id) => {
+    const data = await fetchSimilarMovies(id)
+    setSimilar(data.results)
+    // console.log(data)
+  }
+
+  useEffect(() => {
+    console.log(id)
+  }, [])
 
   useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false })
   }, [navigation])
 
-  return (
-    <>
-      <TopBar />
-      <ScrollView
-        contentContainerStyle={{ paddingBottom: 20 }}
-        style={styles.container}
-      >
-        {/* back button and poster */}
-        <View style={styles.imageContainer}>
-          <Image
-            source={{ uri: "https://via.placeholder.com/500x700" }}
-            style={styles.image}
-          />
-          <LinearGradient
-            colors={["transparent", "rgba(23,23,23,0.8)", "rgba(23,23,23,1)"]}
-            style={styles.linearGradient}
-            start={{ x: 0.5, y: 0 }}
-            end={{ x: 0.5, y: 1 }}
-          />
-        </View>
-        {/* movie details */}
-        <View style={styles.movieDetails}>
-          <Text style={styles.titleText}>This is the Name of the Movie</Text>
-          <Text style={styles.detailsText}>Released • 2020 • 170 min</Text>
-        </View>
-        <View style={styles.genres}>
-          <Text style={styles.genreText}>Horror • Action • Thriller</Text>
-        </View>
-        <View style={styles.description}>
-          <Text style={styles.descText}>
-            Lorem ipsum, dolor sit amet consectetur adipisicing elit. Recusandae
-            deserunt perspiciatis enim nihil consectetur officiis, natus
-            maiores! Minima nisi nulla ducimus voluptate. Voluptates, eius eum!
-          </Text>
-        </View>
-        <Cast cast={cast} />
+  if (loading) {
+    return <LoadingIndicator />
+  } else {
+    if (movie) {
+      const { status, release_date, runtime, genres, overview } = movie
+      return (
+        <>
+          <TopBar />
+          <ScrollView
+            contentContainerStyle={{ paddingBottom: 20 }}
+            style={styles.container}
+          >
+            {/* back button and poster */}
+            <View style={styles.imageContainer}>
+              <Image
+                source={{
+                  uri: backdrop_path
+                    ? `${imagePath}${backdrop_path}`
+                    : require("../assets/poster.png"),
+                }}
+                style={styles.image}
+              />
+              <LinearGradient
+                colors={[
+                  "transparent",
+                  "rgba(23,23,23,0.8)",
+                  "rgba(23,23,23,1)",
+                ]}
+                style={styles.linearGradient}
+                start={{ x: 0.5, y: 0 }}
+                end={{ x: 0.5, y: 1 }}
+              />
+            </View>
+            {/* movie details */}
+            <View style={styles.movieDetails}>
+              {title && <Text style={styles.titleText}>{title}</Text>}
+              <MovieStats
+                status={status}
+                release_date={release_date}
+                runtime={runtime}
+              />
+            </View>
+            <Genres genres={genres} />
+            {overview && (
+              <View style={styles.description}>
+                <Text style={styles.descText}>{overview}</Text>
+              </View>
+            )}
+            <Cast cast={cast} />
 
-        <MovieList title="Similar Movies" data={similar} hideSeeAll />
-      </ScrollView>
-    </>
-  )
+            {similar && (
+              <MovieList title="Similar Movies" data={similar} hideSeeAll />
+            )}
+          </ScrollView>
+        </>
+      )
+    } else {
+      return <LoadingIndicator />
+    }
+  }
 }
 
 export default MovieScreen
@@ -112,19 +169,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 16,
   },
-  genres: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginHorizontal: 20,
-    paddingHorizontal: 20,
-  },
-  genreText: {
-    color: themeStyles.grey,
-    textAlign: "center",
-    marginTop: 10,
-    fontWeight: "bold",
-    fontSize: 16,
-  },
+
   description: {
     paddingHorizontal: 20,
     marginTop: 20,

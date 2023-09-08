@@ -10,11 +10,14 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native"
-import React, { useLayoutEffect, useState } from "react"
+import React, { useCallback, useLayoutEffect, useState } from "react"
 import { themeStyles } from "../themeStyles"
 import TopBar from "../Components/TopBar"
 import { useNavigation } from "@react-navigation/native"
 import { XMarkIcon } from "react-native-heroicons/outline"
+import { debounce } from "lodash"
+import { searchMovies } from "../api/moviedb"
+import MovieResult from "../Components/MovieResult"
 
 const windowWidth = Dimensions.get("window").width
 const windowHeight = Dimensions.get("window").height
@@ -22,10 +25,29 @@ const SearchScreen = () => {
   let navigation = useNavigation()
 
   const [results, setResults] = useState([])
+  const [loading, setLoading] = useState(false)
 
   useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false })
   }, [navigation])
+
+  const handleSearch = (value) => {
+    if (value && value.length > 3) {
+      setLoading(true)
+      searchMovies({
+        query: value,
+        include_adult: "false",
+        language: "en-US",
+        page: "1",
+      }).then((data) => {
+        setLoading(false)
+        console.log(data.results[0])
+        setResults(data.results)
+      })
+    }
+  }
+
+  const handleTextDebounce = useCallback(debounce(handleSearch, 400), [])
 
   return (
     <>
@@ -33,6 +55,7 @@ const SearchScreen = () => {
       <SafeAreaView style={styles.container}>
         <View style={styles.searchContainer}>
           <TextInput
+            onChangeText={handleTextDebounce}
             autoCorrect={false}
             placeholder="Search for a movie"
             placeholderTextColor={themeStyles.grey}
@@ -54,25 +77,7 @@ const SearchScreen = () => {
             )}
             <View style={styles.resultsContainer}>
               {results?.map((item, idx) => {
-                let movieName = "Ant Man and the Wasp: Quantum"
-                return (
-                  <TouchableWithoutFeedback
-                    key={idx}
-                    onPress={() => navigation.push("MovieScreen", item)}
-                  >
-                    <View style={styles.button}>
-                      <Image
-                        source={{ uri: "https://via.placeholder.com/300x400" }}
-                        style={styles.poster}
-                      />
-                      <Text style={styles.title}>
-                        {movieName.length > 17
-                          ? `${movieName.slice(0, 17)}...`
-                          : movieName}
-                      </Text>
-                    </View>
-                  </TouchableWithoutFeedback>
-                )
+                return <MovieResult item={item} key={idx} index={idx} />
               })}
             </View>
           </ScrollView>
@@ -120,20 +125,5 @@ const styles = StyleSheet.create({
     justifyContent: "space-betwwen",
     flexWrap: "wrap",
     gap: 20,
-  },
-  button: {
-    alignItems: "center",
-    justifyContent: "flex-start",
-    gap: 10,
-  },
-  poster: {
-    borderRadius: 10,
-    width: windowWidth * 0.43,
-    height: windowHeight * 0.3,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: themeStyles.grey,
   },
 })
